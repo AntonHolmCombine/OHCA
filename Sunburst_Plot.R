@@ -62,5 +62,5 @@ sunBurstPlot <- function(x.model){
   colorList <- c("#00ff00","#ff0000")
   colorList <- c(colorList, randomColor(count=length(nameList)-2,hue="blue",luminosity = "bright"))
   data <- data.frame(pathList,amountList)
-  sunburst(data, legend = list(w=250,h=27,r=15,s=6),color=list(range=colorList,domain=nameList),legendOrder = nameList)
+  sunburst(data, legend = list(w=250,h=27,r=15,s=5),color=list(range=colorList,domain=nameList),legendOrder = nameList)
 }
