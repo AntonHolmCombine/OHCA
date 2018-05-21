@@ -6,7 +6,7 @@ library(party)
 
 set.seed(1337)
 
-dataset <- read_excel("Imputed_Data_Zeros.xlsx")
+dataset <- read_excel("Imputed_Data.xlsx")
 
 
 shuffled_data <- dataset[sample(nrow(dataset)),]
@@ -73,3 +73,15 @@ for (j in 2:k) {
 text(0.5,0.5,paste("Mean AUC = ",format(final_AUC,digits=5,scientific=F)))
 par(new=F,mar=c(5,14,3,3))
 barplot(final_vimp[order(final_vimp)],horiz=T,main="Relative Variable Importance",col=colorbar,las=1)
+
+con <- file("TestVimp.txt")
+
+final_vimp <- final_vimp[order(-final_vimp)]
+
+writeLines(paste(1:length(final_vimp),names(final_vimp),final_vimp[names(final_vimp)]),con)
+
+for (j in 1:length(perfs)){
+  con <- file(paste("TestAUC_",j,".txt",sep=""))
+  writeLines(paste(1:length(perfs[[j]]@x.values[[1]]),perfs[[j]]@x.values[[1]],perfs[[j]]@y.values[[1]]),con)
+  
+}
