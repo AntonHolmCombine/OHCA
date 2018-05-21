@@ -1,0 +1,14 @@
+set style fill solid
+set border 3
+set boxwidth .7
+mycolor(x) = 65280 -(x*765)
+set label 11 center at 0,.5 "Relative Variable Importance, Imputation MICE" font "Helvetica Bold,16" offset -8,0 rotate
+set lmargin 15
+set bmargin 20
+set xtics nomirror rotate font "Helvetica Bold,11"
+set ytics 0,.2,1 nomirror rotate
+set yrange [0:1]
+plot "Vimp_MICE_Seed1337.txt" using 1:3
+max_y = GPVAL_DATA_Y_MAX
+unset key
+plot "Vimp_MICE_Seed1337.txt" using 1:($3/max_y):(mycolor($0)):xtic(2) with boxes lc rgb variable
