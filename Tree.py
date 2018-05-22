@@ -144,11 +144,11 @@ class Leaf:
 
         if self.good > self.bad:
             u.node(str(i), label="Samples = " + str(self.nbr_samples) + "\n" +
-                   str(np.round(self.good/self.nbr_samples, 2)*100) + "% Good",
+                   str(np.round((self.good/self.nbr_samples)*100)) + "% Good",
                    shape='diamond', fillcolor=(".55 " + str(traffic) +
                                                " 0.999"), color='green')
         else:
             u.node(str(i), label="Samples = " + str(self.nbr_samples) + "\n" +
-                   str(np.round(self.bad / self.nbr_samples, 2)*100) +
+                   str(np.round((self.bad / self.nbr_samples)*100)) +
                    "% Poor", shape='box', color='red', fillcolor=(
                 ".55 " + str(traffic) + " 0.999"), )
