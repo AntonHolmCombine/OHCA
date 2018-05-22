@@ -41,10 +41,12 @@ class Node:
 
     def print_dot(self, u, samples):
         global i
-
-        traffic = round(self.nbr_samples/samples, 2)
-        u.node(str(i), label=self.name + "\n" + "Samples = " + str(
-            self.nbr_samples), color=(".55 " + str(traffic) + " 0.999"))
+        name = (self.name.replace('_', ' ').replace('P ', '').replace('B ', '').
+                replace('A ', ''))
+        traffic = round(np.sqrt(self.nbr_samples/samples), 2)
+        u.node(str(i), label=name + "\n",
+               fillcolor=(".55 " + str(traffic) + " 0.999"),
+               color=(".55 " + str(traffic) + " 0.999"))
         a = str(i)
 
         if self.left:
@@ -109,9 +111,12 @@ class Edge:
         else:
             traffic = self.leaf.nbr_samples
 
-        #penwidth = traffic/samples*10
+        penwidth = str(np.sqrt(traffic/samples)*50)
+        node_traffic = round(np.sqrt(traffic / samples), 2)
         u.edge(a, str(i), label=" " + comp + " " + str(
-            self.condition) + " ", splines='polyline')
+            self.condition) + " ", splines='polyline', penwidth=penwidth,
+               tailclip='false', headclip='false',
+               color=(".55 " + str(node_traffic) + " 0.999"))
 
         if self.node:
             self.node.print_dot(u, samples)
@@ -142,13 +147,16 @@ class Leaf:
     def print_dot(self, u, samples):
         traffic = round(self.nbr_samples / samples, 2)
 
-        if self.good > self.bad:
-            u.node(str(i), label="Samples = " + str(self.nbr_samples) + "\n" +
-                   str(np.round((self.good/self.nbr_samples)*100)) + "% Good",
-                   shape='diamond', fillcolor=(".55 " + str(traffic) +
-                                               " 0.999"), color='green')
+        if self.good >= self.bad:
+            label = (str(int(np.round(self.good/self.nbr_samples, 2)*100)) +
+                     "% of " + str(self.nbr_samples))
+            color = (".4 " + str(np.round(self.good/self.nbr_samples, 2)
+                                 * 1.2 - 0.5) + " 0.999")
+            u.node(str(i), label=label,
+                   fillcolor=color, color=color, )
         else:
-            u.node(str(i), label="Samples = " + str(self.nbr_samples) + "\n" +
-                   str(np.round((self.bad / self.nbr_samples)*100)) +
-                   "% Poor", shape='box', color='red', fillcolor=(
-                ".55 " + str(traffic) + " 0.999"), )
+            label = (str(int(np.round(self.good / self.nbr_samples, 2)*100)) +
+                     "% of " + str(self.nbr_samples))
+            color = (".01 " + str(np.round(self.bad / self.nbr_samples, 2)
+                                  * 1.2 - 0.5) + " 0.999")
+            u.node(str(i), label=label,  color=color, fillcolor=color )

@@ -7,11 +7,15 @@ def export_dot(tree, filename):
     from graphviz import Graph
 
     u = Graph('G', filename=filename + "_dot", format='png')
-    u.edge_attr.update(arrowhead='vee', arrowsize='2')
+    u.graph_attr.update( outputorder='edgesfirst', smoothing='triangle',
+                         )
+    u.edge_attr.update(arrowhead='vee', arrowsize='2', tailclip='false',
+                       headclip='false', color='lightblue2')
 
-    u.node_attr.update(color='lightblue2', style='filled')
+    u.node_attr.update(style='filled, rounded',
+                       outputorder='edgesfirst', smoothing='triangle')
     tree.print_dot(u, tree.nbr_samples)
-    u.view()
+    u.render()
 
 
 def populate_tree(input_data, tree):
@@ -97,7 +101,7 @@ def build_tree(fid, stack, tree):
 
 
 if __name__ == '__main__':
-    for i in range(1, 19):
+    for i in range(1, 401):
         name = 'trees/TreeTxt_{}'.format(i)
         root = make_tree(name)
         data = pd.read_excel("Imputed_Data.xlsx")
