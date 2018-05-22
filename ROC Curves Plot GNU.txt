@@ -1,17 +1,22 @@
 set ytics 0,.2,1 nomirror
 set xtics 0,.2,1 nomirror
-set yrange [.05:1]
-set xrange [.05:1]
-set xlabel "False Positive Rate" font "Helvetica Bold"
-set ylabel "True Positive Rate" font "Helvetica Bold"
-set title "ROC Curves, k-fold CV" font "Helvetica Bold, 14"
+unset key
+set border 3
+set yrange [-.05:1]
+set xrange [-.05:1]
+set xlabel "False Positive Rate" font "Helvetica Bold, 13"
+set ylabel "True Positive Rate" font "Helvetica Bold, 13"
+set label 11 center at graph .5,.5 "Mean AUC = 0.81375" font "Helvetica Bold,13"
+set title "ROC Curves, k-fold CV" font "Helvetica Bold, 16"
+set lmargin 13
+set bmargin 5
 
-plot "AUC_Zeros_Seed1337_1.txt" using 2:3 with lines
-replot "AUC_Zeros_Seed1337_2.txt" using 2:3 with lines
-replot "AUC_Zeros_Seed1337_3.txt" using 2:3 with lines
-replot "AUC_Zeros_Seed1337_4.txt" using 2:3 with lines
-replot "AUC_Zeros_Seed1337_5.txt" using 2:3 with lines
-replot "AUC_Zeros_Seed1337_6.txt" using 2:3 with lines
-replot "AUC_Zeros_Seed1337_7.txt" using 2:3 with lines
-replot "AUC_Zeros_Seed1337_8.txt" using 2:3 with lines
+plot "AUC_MICE_Seed1337_1.txt" using 2:3 with lines
+replot "AUC_MICE_Seed1337_2.txt" using 2:3 with lines
+replot "AUC_MICE_Seed1337_3.txt" using 2:3 with lines
+replot "AUC_MICE_Seed1337_4.txt" using 2:3 with lines
+replot "AUC_MICE_Seed1337_5.txt" using 2:3 with lines
+replot "AUC_MICE_Seed1337_6.txt" using 2:3 with lines
+replot "AUC_MICE_Seed1337_7.txt" using 2:3 with lines
+replot "AUC_MICE_Seed1337_8.txt" using 2:3 with lines
 
