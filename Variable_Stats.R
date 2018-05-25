@@ -86,9 +86,23 @@ for (i in 1:length(vnames)){
   if(vnames[i]=="B_Sex"){
     xlist = c("Male", "Female")
   }
-  
+  if(intervals[[1]][2]<0){
+    xlist<- xlist[-1]
+    goodcount <- goodcount[-1]
+    badcount<- badcount[-1]
+    xlist[1] <- sub("-.","0",xlist[1])
+  }
+  sumV <- goodcount+badcount
+  zeroind <- match(0,sumV)
+  if(!is.na(zeroind)){
+    sumV<-sumV[-zeroind]
+    xlist<-xlist[-zeroind]
+    goodcount<-goodcount[-zeroind]
+    badcount<-badcount[-zeroind]
+  }
+
   
   tp <- gsub("_"," ",vnames[i])
-  tp <- c(tp, paste(paste("\"",xlist,paste(" (",goodcount+badcount,")",sep=""),"\"",sep=""),goodcount,badcount))
+  tp <- c(tp, paste(paste("\"",xlist,paste(" (",sumV,")",sep=""),"\"",sep=""),goodcount,badcount))
   writeLines(tp,con,sep="\n")
 }
