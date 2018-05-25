@@ -12,7 +12,7 @@ binaryV <- c("B_Sex","B_CHF","B_Previous_AMI","B_IHD","B_Previous_arrhythmia","B
              ,"B_Previous_CABG","B_Previous_valvular_surgery","B_ICD"
              ,"B_Pacemaker","P_Bystander_witnessed_arrest","P_Bystander_CPR"
              ,"P_Bystander_defibrillation","P_Automatic_compression_decompression"
-             ,"P_Pre_hospital_intubation","P_Seizures_before_admission","A_Pupil_refelx"
+             ,"P_Pre_hospital_intubation","P_Seizures_before_admission","A_Pupil_reflex"
              ,"A_Cormeal_reflex","A_Cough_reflex","A_Spontaneous_breathing"
              ,"A_Shock_on_admission","Malignancy")
 
@@ -20,8 +20,11 @@ intervalV <- c("B_Age","B_Length","B_Weight","P_Number_of_defibrillations"
                ,"P_CA_to_ALS_min","No_flow","Lo_flow","P_Dose_of_adrenaline"
                ,"A_Initial_temperature","A_pH")
 
+roundingV <- c("B_Age","B_Length","B_Weight","P_Number_of_defibrillations"
+               ,"P_CA_to_ALS_min","No_flow","Lo_flow","P_Dose_of_adrenaline")
 
-for (i in 1:2){
+
+for (i in 1:length(vnames)){
   con <- file(paste("Output_Relation_",vnames[i],".txt",sep=""))
   
   if(vnames[i] %in% binaryV){
@@ -53,7 +56,12 @@ for (i in 1:2){
     goodcount <- c(0,0,0,0)
     badcount <- c(0,0,0,0)
     intervals <- list(c(0,meanV-stdV),c(meanV-stdV,meanV),c(meanV,meanV+stdV),c(meanV+stdV,300))
-    xlist <- c(paste("<",round(meanV-stdV,digits = 2),sep=""),paste(round(meanV-stdV,digits = 2),"-",round(meanV,digits = 2),sep=""),paste(round(meanV,digits = 2),"-",round(meanV+stdV,digits = 2),sep=""),paste(">",round(meanV+stdV,digits = 2),sep=""))
+    if(vnames[i] %in% roundingV){
+      xlist <- c(paste("<",ceiling(meanV-stdV),sep=""),paste(ceiling(meanV-stdV),"-",floor(meanV),sep=""),paste(ceiling(meanV),"-",floor(meanV+stdV),sep=""),paste(">",ceiling(meanV+stdV),sep=""))
+    }else {
+      xlist <- c(paste("<",round(meanV-stdV,digits = 2),sep=""),paste(round(meanV-stdV,digits = 2),"-",round(meanV,digits = 2),sep=""),paste(round(meanV,digits = 2),"-",round(meanV+stdV,digits = 2),sep=""),paste(">",round(meanV+stdV,digits = 2),sep=""))
+      
+    }
     
     for (j in 1:nrow(dataset)){
       if(!is.na(dataset[vnames[i]][[1]][j]) && !is.na(y_data[j])){
@@ -75,6 +83,11 @@ for (i in 1:2){
       }
     }
   }
+  if(vnames[i]=="B_Sex"){
+    xlist = c("Male", "Female")
+  }
+  
+  
   tp <- gsub("_"," ",vnames[i])
   tp <- c(tp, paste(paste("\"",xlist,paste(" (",goodcount+badcount,")",sep=""),"\"",sep=""),goodcount,badcount))
   writeLines(tp,con,sep="\n")
