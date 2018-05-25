@@ -10,22 +10,31 @@ for k in range(0,len(files)):
 
 	nrows = data.shape[0]
 
-	plt.rcParams["font.size"]=13.0
-	concentric = False
+	
+	concentric = True
 
 	if(concentric):
-		fig, ax = plt.subplots(figsize=(8.0,5.0))
+		if(nrows==2):
+			fig, ax = plt.subplots(figsize=(9.0,6.0))
+			plt.rcParams["font.size"]=13.0
+			for i in range(0,nrows):
+				sizes = data.iloc[i,1:3]
+				ax.pie(sizes,radius=1-(0.4*(nrows-(i+1))),colors=["green","red"],wedgeprops=dict(width=0.4,edgecolor="w"),pctdistance=0.67+0.05*(i+1))
+				ax.text(1-(0.4*(nrows-(i+1)))-0.4,0.05,str(data.iloc[i,0]),fontsize=13)
 
-		for i in range(0,nrows):
-			sizes = data.iloc[i,1:3]
-			ax.pie(sizes,radius=1-(0.25*(nrows-(i+1))),colors=["green","red"],wedgeprops=dict(width=0.25,edgecolor="w"),autopct='%1.1f%%',pctdistance=0.67+0.05*(i+1))
+			ax.set(aspect="equal")
+		else:
+			fig, ax = plt.subplots(figsize=(12.0,9.0))
+			plt.rcParams["font.size"]=13.0
+			for i in range(0,nrows):
+				sizes = data.iloc[i,1:3]
+				ax.pie(sizes,radius=1-(0.2*(nrows-(i+1))),colors=["green","red"],wedgeprops=dict(width=0.2,edgecolor="w"),pctdistance=0.67+0.05*(i+1))
+				ax.text(1-(0.2*(nrows-(i+1)))-0.2-(0.01*i),0.05+(0.09*i),str(data.iloc[i,0]),fontsize=13)
 
-
-		ax.set(aspect="equal")
-		plt.legend(["Good","Bad"])
-
+			ax.set(aspect="equal")
 
 	else:
+		plt.rcParams["font.size"]=13.0
 		for i in range(0,nrows):
 
 			sizes = data.iloc[i,1:3]
@@ -46,6 +55,6 @@ for k in range(0,len(files)):
 	tp = open(filename,"r")
 
 	plt.suptitle(next(tp),fontsize=25)
-	#plt.show()
 	plt.legend(["Good","Bad"],loc="lower right",bbox_to_anchor=(1.2,-0.05))
-	plt.savefig(filename+".png",format="png",dpi=200)
+	#plt.show()
+	plt.savefig(filename[:-4]+".png",format="png",dpi=200)
