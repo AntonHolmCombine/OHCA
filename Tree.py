@@ -53,7 +53,8 @@ class Node:
         name = nice_name(self.name)
         if depth <= target:
 
-            u.node(str(i), label=name, fillcolor=color,
+            u.node(str(i), label=name, fillcolor='{},{},{}'.format(120*(self.good/self.nbr_samples)/360,1,1),
+                    color = '{},{},{}'.format(120*(self.good/self.nbr_samples)/360,1,1),
                    fontcolor='black')
         else:
             u.node(str(i), label=name)
@@ -173,9 +174,11 @@ class Edge:
 
 
             u.edge(a, str(i), label=label, splines='polyline',
-                   tailclip='false', headclip='false',
-                   fillcolor='color', color='color',
-                   fontcolor='black')
+                    tailclip='false', headclip='false',
+                    fillcolor='{},{},{}'.format(120*(self.good/self.nbr_samples)/360,1,1), 
+                    color='{},{},{}'.format(120*(self.good/self.nbr_samples)/360,1,1),
+                    fontcolor='black')
+
         else:
             u.edge(a, str(i), label=label, splines='polyline',
                    tailclip='false', headclip='false')
@@ -188,6 +191,27 @@ class Edge:
         else:
             print("Something wrong")
         return done
+
+    def find_leaf(self, name, patient, depth, target):
+        curr = patient[name]
+
+        if (depth <= target and ((curr <= float(self.condition) and
+            self.less_than) or (curr > float(self.condition) and
+                                not self.less_than))):
+
+            if self.node:
+                ll = self.node.left.find_leaf(self.node.name, patient, depth +
+                                                1, target)
+                if ll is not None:
+                    return ll
+                lr = self.node.right.find_leaf(self.node.name, patient,
+                                                 depth + 1, target)
+                if lr is not None:
+                    return lr
+            elif self.leaf:
+                return self.leaf
+
+
 
     def print_dot(self, u, a, samples):
         if self.less_than:
@@ -266,17 +290,10 @@ class Leaf:
 
     def visiulize_base(self, u, patient, depth, target):
         if depth <= target:
-            if self.good >= self.bad:
-                label = (
-                str(int(np.round(self.good / self.nbr_samples, 2) * 100)) +
+            label = (str(int(np.round(self.good / self.nbr_samples, 2) * 100)) +
                 "% ")
-                u.node(str(i), label=label, fillcolor='Green',
-                       color='Green', fontcolor='black')
-            else:
-                label = (
-                str(int(np.round(self.good / self.nbr_samples, 2) * 100)) +
-                "%")
-                u.node(str(i), label=label, fillcolor='Red', fontcolor='black')
+            u.node(str(i), label=label, fillcolor='{},{},{}'.format(120*(self.good/self.nbr_samples)/360,1,1),
+                    color='{},{},{}'.format(120*(self.good/self.nbr_samples)/360,1,1), fontcolor='black')
 
             return True
         else:

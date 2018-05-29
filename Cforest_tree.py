@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from graphviz import Graph
 from Tree import Node, Leaf, Edge, set_i, set_color
 
@@ -45,6 +46,34 @@ def visualize_patient(input_data, tree, tree_nbr):
         u.render()
         target += 1
         if done:
+            ll = tree.left.find_leaf(tree.name, patient, 0, target)
+            lr = tree.right.find_leaf(tree.name, patient, 0, target)
+            u = Graph('G', filename='trees/patients/{}/tree_{}/patient_depth_{'
+                                    '}'.format(
+                pat_nbr, tree_nbr, target + 1), format='png')
+            u.graph_attr.update(outputorder='edgesfirst', smoothing='triangle',
+                                colors='whitesmoke', fontcolor='gray')
+
+            u.edge_attr.update(arrowhead='vee', arrowsize='2', tailclip='false',
+                               headclip='false', color='whitesmoke',
+                               fontcolor='gray')
+
+            u.node_attr.update(style='filled, rounded',
+                               outputorder='edgesfirst',
+                               smoothing='triangle', color='whitesmoke',
+                               fontcolor='gray')
+            if ll is not None:
+                leaf = ll
+            else:
+                leaf = lr
+
+
+            label = (
+            str(int(np.round(leaf.good / leaf.nbr_samples, 2) * 100)) +
+                "%")
+            u.node(str(i), label=label, fillcolor='{},{},{}'.format(120*(leaf.good/leaf.nbr_samples)/360,1,1),
+                     color = '{},{},{}'.format(120*(leaf.good/leaf.nbr_samples)/360,1,1), fontcolor='black',width='7', height='5', fontsize='20')
+            u.render()
             print(target)
             return
 
@@ -146,7 +175,7 @@ def build_tree(fid, stack, tree):
 
 
 if __name__ == '__main__':
-    for i in range(1, 401):
+    for i in range(1, 10):
         name = 'trees/TreeTxt_{}'.format(i)
         root = make_tree(name)
         data = pd.read_excel("Imputed_Data.xlsx")
