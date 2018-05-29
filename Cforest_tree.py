@@ -1,21 +1,63 @@
 import pandas as pd
-from Tree import Node, Leaf, Edge, set_i
+from graphviz import Graph
+from Tree import Node, Leaf, Edge, set_i, set_color
 
 
 def export_dot(tree, filename):
     set_i()
-    from graphviz import Graph
 
-    u = Graph('G', filename=filename + "_dot", format='png')
-    u.graph_attr.update( outputorder='edgesfirst', smoothing='triangle',
-                         )
+    u = Graph('G', filename=filename, format='png')
+    u.graph_attr.update(outputorder='edgesfirst', smoothing='triangle',
+                         colorscheme='rdylgn10')
+
     u.edge_attr.update(arrowhead='vee', arrowsize='2', tailclip='false',
-                       headclip='false', color='lightblue2')
+                       headclip='false', colorscheme='rdylgn10')
 
-    u.node_attr.update(style='filled, rounded',
-                       outputorder='edgesfirst', smoothing='triangle')
+    u.node_attr.update(style='filled, rounded', outputorder='edgesfirst',
+                       smoothing='triangle', colorscheme='rdylgn10')
     tree.print_dot(u, tree.nbr_samples)
     u.render()
+
+
+def visualize_patient(input_data, tree, tree_nbr):
+    set_color(tree_nbr)
+    pat_nbr = 0
+    patient = input_data.iloc[pat_nbr]
+    target = -1
+    done = False
+    while not done:
+        set_i()
+
+        u = Graph('G', filename='trees/patients/{}/tree_{}/patient_depth_{'
+                                '}'.format(
+            pat_nbr, tree_nbr, target + 1), format='png')
+        u.graph_attr.update(outputorder='edgesfirst', smoothing='triangle',
+                             colors='whitesmoke', fontcolor='gray')
+
+        u.edge_attr.update(arrowhead='vee', arrowsize='2', tailclip='false',
+                           headclip='false', color='whitesmoke',
+                           fontcolor='gray')
+
+        u.node_attr.update(style='filled, rounded', outputorder='edgesfirst',
+                           smoothing='triangle', color='whitesmoke',
+                           fontcolor='gray')
+        done = tree.visiulize_base(u, patient, 0, target)
+        u.render()
+        target += 1
+        if done:
+            print(target)
+            return
+
+
+    # u.view()
+    #
+    # u.body[0] = u.body[0].replace(']', ' fillcolor=blue]')
+    # u.view()
+    # for i in range(1, len(u.body)):
+    #     item = u.body[i]
+    #     print()
+
+
 
 
 def populate_tree(input_data, tree):
@@ -57,14 +99,13 @@ def build_tree(fid, stack, tree):
             else:
                 last.right.add_node(node)
 
-            if id_ in tree:
-                print("Something wrong")
-            else:
-                tree[id_] = node
-
+            tree[id_] = node
             edge = Edge(cond, comp == '<=')
-            node.add_left(edge)
 
+            if 'Sex' in name_:
+                edge.sex = True
+
+            node.add_left(edge)
             stack.append(node)
 
             return build_tree(fid, stack, tree)
@@ -78,6 +119,10 @@ def build_tree(fid, stack, tree):
                 tree[id_] = Node(id_, name_)
             node = tree[id_]
             edge = Edge(cond, comp == '<=')
+
+            if 'Sex' in name_:
+                edge.sex = True
+
             node.add_right(edge)
             return build_tree(fid, stack, tree)
 
@@ -106,4 +151,5 @@ if __name__ == '__main__':
         root = make_tree(name)
         data = pd.read_excel("Imputed_Data.xlsx")
         populate_tree(data, root['1'])
-        export_dot(root['1'], name)
+        #export_dot(root['1'], name)
+        visualize_patient(data, root['1'], i)
