@@ -3,16 +3,18 @@ import os
 import math
 import imageio
 import pandas as pd
+import numpy as np
 
 def mergeImages(imList,dir,patNo,data):
 	from PIL import Image
 	from PIL import ImageFont
 	from PIL import ImageDraw
+	from resizeimage import resizeimage
 
 
 	newImSize = [3000,2000]
-	nrows = 4
-	ncols = 5
+	nrows = 3
+	ncols = 3
 
 	nbrOfImg = len(imList)
 	new_im=Image.new('RGBA',newImSize,(255,255,255,255))
@@ -25,8 +27,15 @@ def mergeImages(imList,dir,patNo,data):
 
 	for i in range(0,nbrOfImg):
 		im = Image.open(imList[i])
-		im.thumbnail((x_steps-x_steps*0.05,y_steps))
-		new_im.paste(im,(x_ind*x_steps,150+y_ind*y_steps))
+		width, height = im.size
+		if width > math.floor(0.95*x_steps) and height > y_steps:
+			im.thumbnail((math.floor(0.95*x_steps),y_steps))
+			new_im.paste(im,(x_ind*x_steps,150+y_ind*y_steps))
+		else:
+			 xDiff = math.floor(0.95*x_steps)-width
+			 yDiff = y_steps - height
+			 new_im.paste(im,(x_ind*x_steps+max(math.floor(xDiff/2),0),150+y_ind*y_steps+max(0,math.floor(yDiff/2))))
+
 		x_ind = x_ind + 1
 		if(x_ind>=ncols):
 			x_ind=0
@@ -40,13 +49,13 @@ def mergeImages(imList,dir,patNo,data):
 	else:
 		sex = "Male"
 	draw = ImageDraw.Draw(new_im)
-	font = ImageFont.truetype("arial.ttf",56)
+	font = ImageFont.truetype("arialbd.ttf",72)
 	draw.text((newImSize[0]/2-100,50),sex + ", " + str(int(age)),(0,0,0),font=font)		
 	new_im.save(dir+"Merged Image.png")
 	return(dir+"Merged Image.png")
 
 
-noIm = 20
+noIm = 9
 patient = "pat_0"
 
 
@@ -68,5 +77,10 @@ images = []
 for filename in mergedImages:
 	images.append(imageio.imread(filename))
 
-kargs={"duration":1}
-imageio.mimsave(workdir+"\\Movie.gif",images,"GIF",**kargs)
+durations = list()
+for i in range(0,len(images)-1):
+	durations.append(1)
+durations.append(5)
+
+kargs={"duration":durations}
+imageio.mimsave(workdir+"\\Movie.gif",images,"GIF-PIL",**kargs)
