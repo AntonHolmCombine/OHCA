@@ -5,7 +5,7 @@ library(ROCR)
 library(party)
 
 dataset <- read_excel("Imputed_data.xlsx")
-
+set.seed(1337)
 
 shuffled_data <- dataset[sample(nrow(dataset)),]
 x.evaluate <- shuffled_data[1:200,]
@@ -48,6 +48,6 @@ ntreeAUC <- ntreeAUC/length(mtrygrid)
 
 par(mfrow=c(1,2))
 
-plot(ntreegrid,ntreeAUC,main="Ntree AUC Values over grid", xlab="Ntree", ylab="AUC")
+plot(ntreegrid,ntreeAUC,main="Ntree AUC Values over grid", xlab="Ntree", ylab="Mean AUC")
 
-plot(mtrygrid,mtryAUC,main="Mtry AUC Values over grid", xlab="Mtry",ylab="AUC")
+plot(mtrygrid,mtryAUC,main="Mtry AUC Values over grid", xlab="Mtry",ylab="Mean AUC")
