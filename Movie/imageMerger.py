@@ -58,7 +58,7 @@ def mergeImages(imList,dir,patNo,data):
 noIm = 36
 startind = 150
 newImSize = [3000,2000]
-patient = "pat_1"
+patient = "pat_0"
 
 
 workdir = '{}/patients/{}{}'.format(os.getcwd(),patient,"/")
