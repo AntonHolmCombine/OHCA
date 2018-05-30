@@ -4,17 +4,17 @@ import math
 import imageio
 import pandas as pd
 import numpy as np
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
+global newImSize
 
 def mergeImages(imList,dir,patNo,data):
-	from PIL import Image
-	from PIL import ImageFont
-	from PIL import ImageDraw
-	from resizeimage import resizeimage
 
+	global newImSize
 
-	newImSize = [3000,2000]
-	nrows = 3
-	ncols = 3
+	nrows = 6
+	ncols = 6
 
 	nbrOfImg = len(imList)
 	new_im=Image.new('RGBA',newImSize,(255,255,255,255))
@@ -55,32 +55,53 @@ def mergeImages(imList,dir,patNo,data):
 	return(dir+"Merged Image.png")
 
 
-noIm = 9
-patient = "pat_0"
+noIm = 36
+startind = 150
+newImSize = [3000,2000]
+patient = "pat_1"
 
 
-workdir = os.getcwd() + "\\" + patient
-patnr = int(workdir.split("pat_")[1])
-tp = glob.glob(workdir +"\\step_*")
+workdir = '{}/patients/{}{}'.format(os.getcwd(),patient,"/")
+patnr = int(patient.split("pat_")[1])
+tp = glob.glob(workdir +"step_*")
 nbrOfSteps = len(tp)
 mergedImages = []
 data = pd.read_excel("Imputed_Data.xlsx")
 
 for i in range(0,nbrOfSteps):
-	readDir = workdir + "\\step_" + str(i) + "\\"
+	readDir = workdir + "step_" + str(i) + "\\"
 	files = glob.glob(readDir + "tree_*.png")
 
-	imName = mergeImages(files[0:noIm],readDir,patnr,data)
+	imName = mergeImages(files[startind:startind + noIm],readDir,patnr,data)
 	mergedImages.append(imName)
 
 images = []
 for filename in mergedImages:
 	images.append(imageio.imread(filename))
 
+finalname = '{}/patients/{}/final/final_im.png'.format(os.getcwd(),patient)
+im = Image.open(finalname)
+tpim = Image.new('RGBA',newImSize,(255,255,255,255))
+im2=im.resize([2000,1333])
+tpim.paste(im2,(math.floor((newImSize[0]-2000)/2),math.floor((newImSize[1]-1333)/2)))
+
+age = data.iloc[patnr]["B_Age"]
+sex = data.iloc[patnr]["B_Sex"]
+if(sex==1):
+	sex = "Female"
+else:
+	sex = "Male"
+draw = ImageDraw.Draw(tpim)
+font = ImageFont.truetype("arialbd.ttf",72)
+draw.text((newImSize[0]/2-100,50),sex + ", " + str(int(age)),(0,0,0),font=font)
+
+tpim.save(finalname)
+images.append(imageio.imread(finalname))
 durations = list()
-for i in range(0,len(images)-1):
+for i in range(0,len(images)-2):
 	durations.append(1)
-durations.append(5)
+durations.append(4)
+durations.append(4)
 
 kargs={"duration":durations}
-imageio.mimsave(workdir+"\\Movie.gif",images,"GIF-PIL",**kargs)
+imageio.mimsave(workdir+"Movie.gif",images,"GIF-PIL",**kargs)
