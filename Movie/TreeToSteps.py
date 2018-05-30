@@ -2,8 +2,8 @@ import glob
 import os
 from shutil import copyfile
 
-patient = "pat_0"
-workdir = os.getcwd()+"\\"+patient+"\\"
+patient = "pat_1"
+workdir = '{}/patients/{}{}'.format(os.getcwd(),patient,"/")
 trees = glob.glob(workdir+"tree_*")
 nbrOfTrees = len(trees)
 allTerminal = False
