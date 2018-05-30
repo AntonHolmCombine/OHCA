@@ -22,7 +22,7 @@ def export_dot(tree, filename):
 
 def visualize_patient(input_data, tree, tree_nbr):
     set_color(tree_nbr)
-    pat_nbr = 0
+    pat_nbr = 1
     patient = input_data.iloc[pat_nbr]
     target = -1
     done = False
@@ -87,7 +87,31 @@ def visualize_patient(input_data, tree, tree_nbr):
     #     print()
 
 
+def add_last_im():
+    pat_nr = 1
+    u = Graph('G', filename='trees/patients/{}/final/final_im'.format(pat_nr), format='png')
 
+    u.graph_attr.update(outputorder='edgesfirst', smoothing='triangle',
+                     colors='whitesmoke', fontcolor='gray')
+
+    u.edge_attr.update(arrowhead='vee', arrowsize='2', tailclip='false',
+                     headclip='false', color='whitesmoke',
+                     fontcolor='gray')
+
+    u.node_attr.update(style='filled, rounded',
+                     outputorder='edgesfirst',
+                     smoothing='triangle', color='whitesmoke',
+                    fontcolor='gray')
+    filename = 'trees/patients/Probabilities/Probs_pat_{}.txt'.format(pat_nr+1)
+    data = pd.read_csv(filename,sep=",",header = None)
+
+    label = (
+            str(int((data.iloc[0,0]) * 100)) +
+                "%")
+
+    u.node(str(0), label=label, fillcolor='{},{},{}'.format(120*data.iloc[0,0]/360,1,1),
+                     color = '{},{},{}'.format(120*data.iloc[0,0]/360,1,1), fontcolor='black',width='7', height='5', fontsize='20')
+    u.render()
 
 def populate_tree(input_data, tree):
     for j in range(0, len(input_data)):
@@ -175,10 +199,12 @@ def build_tree(fid, stack, tree):
 
 
 if __name__ == '__main__':
-    for i in range(1, 10):
+    for i in range(1, 401):
         name = 'trees/TreeTxt_{}'.format(i)
         root = make_tree(name)
         data = pd.read_excel("Imputed_Data.xlsx")
         populate_tree(data, root['1'])
         #export_dot(root['1'], name)
         visualize_patient(data, root['1'], i)
+
+    add_last_im()
