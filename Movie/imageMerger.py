@@ -41,7 +41,9 @@ def mergeImages(imList,dir,patNo,data):
 			x_ind=0
 			y_ind=y_ind+1
 
-
+	logo = Image.open('{}/Combine_Svart_Tryck.png'.format(os.getcwd()))
+	logo.thumbnail((200,125))
+	new_im.paste(logo,(newImSize[0]-250,10))
 	age = data.iloc[patNo]["B_Age"]
 	sex = data.iloc[patNo]["B_Sex"]
 	if(sex==1):
@@ -58,50 +60,70 @@ def mergeImages(imList,dir,patNo,data):
 noIm = 36
 startind = 150
 newImSize = [3000,2000]
-patient = "pat_0"
-
-
-workdir = '{}/patients/{}{}'.format(os.getcwd(),patient,"/")
-patnr = int(patient.split("pat_")[1])
-tp = glob.glob(workdir +"step_*")
-nbrOfSteps = len(tp)
-mergedImages = []
-data = pd.read_excel("Imputed_Data.xlsx")
-
-for i in range(0,nbrOfSteps):
-	readDir = workdir + "step_" + str(i) + "\\"
-	files = glob.glob(readDir + "tree_*.png")
-
-	imName = mergeImages(files[startind:startind + noIm],readDir,patnr,data)
-	mergedImages.append(imName)
-
-images = []
-for filename in mergedImages:
-	images.append(imageio.imread(filename))
-
-finalname = '{}/patients/{}/final/final_im.png'.format(os.getcwd(),patient)
-im = Image.open(finalname)
-tpim = Image.new('RGBA',newImSize,(255,255,255,255))
-im2=im.resize([2000,1333])
-tpim.paste(im2,(math.floor((newImSize[0]-2000)/2),math.floor((newImSize[1]-1333)/2)))
-
-age = data.iloc[patnr]["B_Age"]
-sex = data.iloc[patnr]["B_Sex"]
-if(sex==1):
-	sex = "Female"
-else:
-	sex = "Male"
-draw = ImageDraw.Draw(tpim)
-font = ImageFont.truetype("arialbd.ttf",72)
-draw.text((newImSize[0]/2-100,50),sex + ", " + str(int(age)),(0,0,0),font=font)
-
-tpim.save(finalname)
-images.append(imageio.imread(finalname))
+patients = ["pat_0","pat_1","pat_2"]
 durations = list()
-for i in range(0,len(images)-2):
-	durations.append(1)
-durations.append(4)
-durations.append(4)
+data = pd.read_excel("Imputed_Data.xlsx")
+images = []
 
+for patient in patients:
+	workdir = '{}/patients/{}{}'.format(os.getcwd(),patient,"/")
+	patnr = int(patient.split("pat_")[1])
+	tp = glob.glob(workdir +"step_*")
+	nbrOfSteps = len(tp)
+	mergedImages = []
+
+
+	for i in range(0,nbrOfSteps):
+		readDir = workdir + "step_" + str(i) + "\\"
+		files = glob.glob(readDir + "tree_*.png")
+
+		imName = mergeImages(files[startind:startind + noIm],readDir,patnr,data)
+		mergedImages.append(imName)
+
+
+	for filename in mergedImages:
+		images.append(imageio.imread(filename))
+
+	finalname = '{}/patients/{}/final/final_im.png'.format(os.getcwd(),patient)
+	im = Image.open(finalname)
+	tpim = Image.new('RGBA',newImSize,(255,255,255,255))
+	im2=im.resize([2000,1333])
+	tpim.paste(im2,(math.floor((newImSize[0]-2000)/2),math.floor((newImSize[1]-1333)/2)))
+	logo = Image.open('{}/Combine_Svart_Tryck.png'.format(os.getcwd()))
+	logo.thumbnail((200,125))
+	tpim.paste(logo,(newImSize[0]-250,10))
+	age = data.iloc[patnr]["B_Age"]
+	sex = data.iloc[patnr]["B_Sex"]
+	if(sex==1):
+		sex = "Female"
+	else:
+		sex = "Male"
+	draw = ImageDraw.Draw(tpim)
+	font = ImageFont.truetype("arialbd.ttf",72)
+	draw.text((newImSize[0]/2-100,50),sex + ", " + str(int(age)),(0,0,0),font=font)
+
+	tpim.save(finalname.split(".p")[0]+"withText"+".png")
+	images.append(imageio.imread(finalname.split(".p")[0]+"withText"+".png"))
+
+
+	treeLengths = pd.read_csv('{}/patients/{}/TreeLength.txt'.format(os.getcwd(),patient),header=None)
+	readDir = workdir + "step_0"+"\\"
+	files = glob.glob(readDir+"tree_*.png")
+	locations = []
+	for i in range(0,noIm):
+		locations.append(files[startind:startind+noIm][i].split("tree_")[1].split("_")[0])
+
+	maxtreelength = max(treeLengths.iloc[locations][0])
+
+
+	for i in range(0,maxtreelength):
+		durations.append(0.5)
+	for i in range(maxtreelength,len(mergedImages)-1):
+		durations.append(0)
+	durations.append(2)
+	durations.append(2)
+
+print(len(durations))
+print(len(images))
 kargs={"duration":durations}
-imageio.mimsave(workdir+"Movie.gif",images,"GIF-PIL",**kargs)
+imageio.mimsave(os.getcwd()+"/Movie.gif",images,"GIF-PIL",**kargs)
