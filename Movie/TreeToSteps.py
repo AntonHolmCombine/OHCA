@@ -1,14 +1,24 @@
 import glob
 import os
 from shutil import copyfile
+import pandas as pd
 
-patient = "pat_1"
+patient = "pat_2"
 workdir = '{}/patients/{}{}'.format(os.getcwd(),patient,"/")
 trees = glob.glob(workdir+"tree_*")
 nbrOfTrees = len(trees)
 allTerminal = False
 terminals = []
 stepTracker = 0
+treeDepths = []
+
+for i in range(0,len(trees)):
+	nt = len(glob.glob('{}/patients/{}/tree_{}/*.png'.format(os.getcwd(),patient,i+1)))
+	treeDepths.append(nt)
+
+td = pd.DataFrame(treeDepths)
+
+td.to_csv('{}/patients/{}/TreeLength.txt'.format(os.getcwd(),patient),index = False,header = False)
 
 while(not(allTerminal)):
 	os.mkdir(workdir + "step_" + str(stepTracker))
@@ -27,3 +37,4 @@ while(not(allTerminal)):
 	if(len(terminals)>=nbrOfTrees):
 		allTerminal = True
 	stepTracker += 1
+	
